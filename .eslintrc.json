@@ -1,0 +1,25 @@
+{
+  "env": {
+    "node": true,
+    "browser": false,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-const": [
+      "error"
+    ],
+    "no-use-before-define": [
+      2,
+      "nofunc"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ]
+  }
+}
