@@ -20,7 +20,10 @@
   "devDependencies": {
     "eslint": "^4.8.0"
   },
-  "scripts": {},
+  "scripts": {
+    "test-release": "npm pack && tar --list -f webpack-stats-graph-*.tgz",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/g0t4/webpack-stats-graph.git"
