@@ -28,7 +28,7 @@ https://chocolatey.org/packages/Graphviz
 #### build the graph:
 ```bash
 npm install -g webpack-stats-graph
-statsgraph stats.json
+webpack-stats-graph stats.json
 ```
 
 #### open graph

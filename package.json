@@ -2,7 +2,12 @@
   "name": "webpack-stats-graph",
   "version": "1.0.0",
   "description": "Generate a graph to visualize modules and bundles from webpack via stats.json",
-  "main": "index.js",
+  "bin": {
+    "webpack-stats-graph": "index.js"
+  },
+  "files": [
+    "index.js"
+  ],
   "dependencies": {
     "chalk": "^2.1.0",
     "color-convert": "^1.9.0",
