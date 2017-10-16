@@ -130,9 +130,6 @@ const outputDirectory = path.join(dir, relativeOutputDirectory);
 info(`Writing files to ${relativeOutputDirectory}`);
 shell.mkdir('-p', outputDirectory);
 
-const htmlFile = path.join(outputDirectory, '/interactive.html');
-ShellString(interactiveHtml('graph.svg')).to(htmlFile);
-
 const dotFile = path.join(outputDirectory, 'graph.dot');
 ShellString(graph.to_dot()).to(dotFile);
 
@@ -144,6 +141,12 @@ if (render.code !== 0) {
   error('Render failed');
   process.exit(1);
 }
+
+const svg = shell.cat(svgFile);
+const svgDatauri = new DataURI();
+svgDatauri.format('.svg', svg);
+const htmlFile = path.join(outputDirectory, '/interactive.html');
+ShellString(interactiveHtml(svgDatauri.content)).to(htmlFile);
 
 function styleModuleNode(node, m) {
   // note - example wise this is an opportunity for pattern matching with babel transform?
