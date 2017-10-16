@@ -638,7 +638,7 @@ function parseClusterDetails(chunks) {
   return {
     graphId: parsedChunks.map(c => c.graphId).join(' & '),
     // rebuild label so as not to include runtime/not & eager/lazy to avoid confusion in overlap visual groups
-    label: parsedChunks.map(c => c.nameForOverlap).join(' & '),
+    label: 'overlap:\n' + parsedChunks.map(c => c.nameForOverlap).join(' & '),
 
     // some things we only want to show for overlap clusters
     // other things we only want to show on chunk's cluster itself
