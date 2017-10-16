@@ -638,7 +638,7 @@ function parseClusterDetails(chunks) {
   return {
     graphId: parsedChunks.map(c => c.graphId).join(' & '),
     // rebuild label so as not to include runtime/not & eager/lazy to avoid confusion in overlap visual groups
-    label: parsedChunks.map(c => c.name).join(' & '),
+    label: parsedChunks.map(c => c.nameForOverlap).join(' & '),
 
     // some things we only want to show for overlap clusters
     // other things we only want to show on chunk's cluster itself
@@ -648,10 +648,20 @@ function parseClusterDetails(chunks) {
 
 }
 
+function chunkDisplayName(chunk) {
+  if (chunk.names && chunk.names.length > 0) {
+    return chunk.names.join(',');
+  }
+  // if the chunk has no name(s) then use the chunk id
+  // example: aggressive merging plugin in webpack/webpack repo
+  return chunk.id;
+}
+
 function parseClusterDetailsFromOneChunk(chunk) {
   const parsed = {
     graphId: chunk.id,
-    label: chunk.names.join(','),
+    label: chunkDisplayName(chunk),
+    nameForOverlap: chunkDisplayName(chunk),
     isVisualOverlap: false,
     files: chunk.files,
   };
