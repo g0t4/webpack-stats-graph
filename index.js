@@ -55,6 +55,10 @@ const argv = yargs
       default: 500,
       desc: 'Number of modules to consider a graph large to switch edge type to avoid long rendering times.'
     },
+    'output-folder': {
+      default: 'statsgraph',
+      desc: 'Folder for generated files: graph.svg, graph.dot, interactive.html'
+    }
   })
   .help()
   .argv;
@@ -121,12 +125,10 @@ if (bigGraph) {
 
 const graph = buildGraph(stats);
 
-// ensure an empty .graph directory
-const relativeOutputDirectory = '.graph';
+const relativeOutputDirectory = argv.outputFolder;
 const outputDirectory = path.join(dir, relativeOutputDirectory);
 info(`Writing files to ${relativeOutputDirectory}`);
-shell.rm('-rf', outputDirectory);
-shell.mkdir(outputDirectory);
+shell.mkdir('-p', outputDirectory);
 
 const htmlFile = path.join(outputDirectory, '/interactive.html');
 ShellString(interactiveHtml('graph.svg')).to(htmlFile);
