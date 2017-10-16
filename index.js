@@ -575,7 +575,11 @@ function displaySize(size) {
 
 function createStyledCluster(graph, clusterDetails) {
   const clusterId = `cluster_${clusterDetails.graphId}`;
-  const cluster = graph.addCluster(clusterId);
+  const clusterIdQuoted = `"${clusterId}"`;
+  // graphviz nodejs lib doesn't add double quotes around cluster IDs - but does when you pass to attributes like ltail :(
+  // aggressive merging plugin is a good example of needing quotes because there are combined chunks that have multiple chunk ids combined and I use ' & ' right now to delineate that.
+  // the library does add double quotes around node IDs
+  const cluster = graph.addCluster(clusterIdQuoted);
   cluster.set('label', clusterDetails.label);
   // hue and saturation at 0 means color plays no role and we're just using lightness (gray)
   cluster.set('fontcolor', hslToGraphvizHsv([0, 0, 28]));
@@ -620,6 +624,7 @@ function addFileEdge(clusterDetails, clusterId, cluster, graph) {
     fileEdge.set('arrowsize', '.75');
     fileEdge.set('color', hslToGraphvizHsv([blueHue, 58, 45]));
     // set logical tail to cluster so edge starts at cluster, basically graphviz stops rendering edge once it hits cluster, not all the way in to the node
+    // ltail will escape passed string ID, so don't escape it
     fileEdge.set('ltail', clusterId);
   });
 }
