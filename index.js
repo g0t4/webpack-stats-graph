@@ -446,7 +446,8 @@ function buildGraph(stats) {
       node.set('labelloc', 'c');
       const isEntryModule = m.depth === 0;
       if (isEntryModule) {
-        node.set('label', labels[0]);
+        // If I want an arrow I can't have record based AFAIK
+        node.set('label', labels.join(' | '));
         node.set('shape', 'rarrow');
         node.set('margin', 0.15);
       }
