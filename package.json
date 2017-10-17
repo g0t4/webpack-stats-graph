@@ -1,6 +1,6 @@
 {
   "name": "webpack-stats-graph",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Generate a graph to visualize modules and bundles from webpack via stats.json",
   "bin": {
     "webpack-stats-graph": "index.js"
