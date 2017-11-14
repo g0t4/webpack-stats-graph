@@ -52,8 +52,8 @@ const argv = yargs
       desc: 'Show query string on request inlined loaders'
     },
     'big-graph-threshold': {
-      default: 500,
-      desc: 'Number of modules to consider a graph large to switch edge type to avoid long rendering times.'
+      default: 100,
+      desc: 'Number of modules to consider a graph large. Above this threshold the graph will be optimized for a large number of modules. For example, to switch edge type to avoid long rendering times.'
     },
     'output-folder': {
       default: 'statsgraph',
