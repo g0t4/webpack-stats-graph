@@ -11,6 +11,7 @@ const yargs = require('yargs');
 const chalk = require('chalk');
 const fs = require('fs');
 const url = require('url');
+const escape = require('escape-html');
 
 // specify and parse CLI args
 const argv = yargs
@@ -464,20 +465,17 @@ function buildGraph(stats) {
       // in this case I'm excluding files over 10,000 bytes (i.e. lodash) which fails to render in both URL and tooltip from my testing
       if (m.source && m.size < 10000) {
 
-        if (showModuleSourceInNodeTooltip) {
+        if (showModuleSourceInNodeUrl) {
           const datauri = new DataURI();
           datauri.format('.js', m.source);
           node.set('URL', datauri.content);
         }
 
-        if (showModuleSourceInNodeUrl) {
-          // escape source to play well with dot language
-          const escapedSource = m.source
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r');
-          node.set('tooltip', escapedSource);
+        if (showModuleSourceInNodeTooltip) {
+          // ultimately this maps to a browser tooltip via an svg (graphviz nodejs object model => dot => svg)
+          // but it has to pass through the `dot` format which chokes IIRC on '\' and '"' and maybe also '\n'
+          // interestingly, dot cli will escape the tooltip but only if the dot is valid so just escape this here and avoid issues with dot format
+          node.set('tooltip', escape(m.source));
         }
 
       }
