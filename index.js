@@ -464,19 +464,18 @@ function buildGraph(stats) {
       // in this case I'm excluding files over 10,000 bytes (i.e. lodash) which fails to render in both URL and tooltip from my testing
       if (m.source && m.size < 10000) {
 
-        if (showModuleSourceInNodeTooltip) {
+        if (showModuleSourceInNodeUrl) {
           const datauri = new DataURI();
           datauri.format('.js', m.source);
           node.set('URL', datauri.content);
         }
 
-        if (showModuleSourceInNodeUrl) {
-          // escape source to play well with dot language
+        if (showModuleSourceInNodeTooltip) {
+          // escape source to play well with dot language as intermediary to title attribute in svg
           const escapedSource = m.source
             .replace(/\\/g, '\\\\')
             .replace(/"/g, '\\"')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r');
+            .replace(/\n/g, '&#10;');
           node.set('tooltip', escapedSource);
         }
 
