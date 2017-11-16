@@ -252,15 +252,15 @@ function parseModule(m) {
     // say we have this package: "./node_modules/style-loader/lib/urls.js"
 
     // then package name is style-loader
-    const packageNameMatches = nameWithoutLoaders.match(/node_modules\/([^\/]*)/);
-    packageDetails.name = packageNameMatches ? packageNameMatches[1] : '';
-
+    // match both scoped and not package names
+    // regex tester: https://regex101.com
+    const extractPackageDetails = nameWithoutLoaders.match(/node_modules\/(@[^\/]+\/[^\/]+|[^\/]+)\/(.*)/);
+    packageDetails.name = extractPackageDetails ? extractPackageDetails[1] : '';
     // and filePath is lib/urls.js
-    const filePathMatches = nameWithoutLoaders.match(/node_modules\/[^\/]*\/(.*)/);
-    packageDetails.filePath = filePathMatches ? filePathMatches[1] : '';
+    packageDetails.filePath = extractPackageDetails ? extractPackageDetails[2] : '';
 
     // and filename is urls.js
-    packageDetails.filename = filePathMatches ? path.basename(filePathMatches[1]) : '';
+    packageDetails.filename = packageDetails.filePath ? path.basename(packageDetails.filePath) : '';
   }
 
   // context import detection
