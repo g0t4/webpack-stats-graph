@@ -6,7 +6,7 @@ const _ = require('lodash');
 const graphviz = require('graphviz');
 const DataURI = require('datauri');
 const convert = require('color-convert');
-const {ShellString} = shell = require('shelljs');
+const {ShellString, cp, mkdir, exec, which, cat} = require('shelljs');
 const yargs = require('yargs');
 const chalk = require('chalk');
 const fs = require('fs');
@@ -58,6 +58,10 @@ const argv = yargs
     'output-folder': {
       default: 'statsgraph',
       desc: 'Folder for generated files: graph.svg, graph.dot, interactive.html'
+    },
+    'archive-graphs': {
+      default: true,
+      desc: 'Write all files to output-folder/archive/<stats.hash>, this is useful to build a history of graphs to compare. An index is cataloged in output-folder/archive/index.html',
     }
   })
   .help()
@@ -100,7 +104,7 @@ const warn = quiet
 const info = quiet
   ? doNothing : message => console.log(message);
 
-if (!shell.which('dot')) {
+if (!which('dot')) {
   error('This script requires the dot executable\nPlease make sure graphviz (http://www.graphviz.org/Download.php) is installed and the bin directory, which contains dot, is in the path.');
   process.exit(1);
 }
@@ -117,7 +121,7 @@ if (!fs.existsSync(statsFile)) {
   error(`File not found for stats: ${statsFile}`);
   process.exit(1);
 }
-const stats = require(statsFile);
+const stats = JSON.parse(cat(statsFile));
 const bigGraph = stats.modules.length > bigGraphModuleThreshold;
 if (bigGraph) {
   warn(`Detected a large graph with ${stats.modules.length} modules, edges will be curvy instead of straight.`);
@@ -128,7 +132,7 @@ const graph = buildGraph(stats);
 const relativeOutputDirectory = argv.outputFolder;
 const outputDirectory = path.join(dir, relativeOutputDirectory);
 info(`Writing files to ${relativeOutputDirectory}`);
-shell.mkdir('-p', outputDirectory);
+mkdir('-p', outputDirectory);
 
 const dotFile = path.join(outputDirectory, 'graph.dot');
 ShellString(graph.to_dot()).to(dotFile);
@@ -136,17 +140,32 @@ ShellString(graph.to_dot()).to(dotFile);
 const svgFile = path.join(outputDirectory, 'graph.svg');
 // I was using graphviz to call dot but it didn't fail gracefully so I'm calling the command directly.
 // this needs adjusted if you use a different type of graph layout (not dot)
-const render = shell.exec(`dot -Tsvg -o ${svgFile} ${dotFile}`);
+const render = exec(`dot -Tsvg -o ${svgFile} ${dotFile}`);
 if (render.code !== 0) {
   error('Render failed');
   process.exit(1);
 }
 
-const svg = shell.cat(svgFile);
+const svg = cat(svgFile);
 const svgDatauri = new DataURI();
 svgDatauri.format('.svg', svg);
-const htmlFile = path.join(outputDirectory, '/interactive.html');
+const htmlFile = path.join(outputDirectory, 'interactive.html');
 ShellString(interactiveHtml(svgDatauri.content)).to(htmlFile);
+
+if (argv.archiveGraphs) {
+  // todo if hash exists in archive, we should error if files are different, or just ignore if same
+  const archiveDirectory = path.join(outputDirectory, 'archive');
+  const hashDirectory = path.join(archiveDirectory, stats.hash);
+
+  info(`Writing archive files to ${hashDirectory}`);
+  mkdir('-p', hashDirectory);
+  cp(dotFile, path.join(hashDirectory, 'graph.dot'));
+  cp(svgFile, path.join(hashDirectory, 'graph.svg'));
+  cp(htmlFile, path.join(hashDirectory, 'interactive.html'));
+  cp(statsFile, path.join(hashDirectory, 'stats.json'));
+  // todo move more logic to archive and break out more modules
+  require('./archive')(stats, archiveDirectory);
+}
 
 function styleModuleNode(node, m) {
   // note - example wise this is an opportunity for pattern matching with babel transform?
