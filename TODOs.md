@@ -1,0 +1,1 @@
+- show npm package versions in graph - would help understand what has changed when you update an app and the deps shuffle around - # would help quickly find what might be diff
