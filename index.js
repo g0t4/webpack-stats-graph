@@ -342,6 +342,7 @@ function parseModule(m) {
     label: moduleDisplayText().replace(/"/g, /'/),
     depth: m.depth,
     issuers: m.reasons
+      .filter(d => d.moduleId !== null)
     // Stats.js filters out modules only https://github.com/webpack/webpack/blob/5433b8cc785c6e71c29ce5f932ae6595f2d7acb5/lib/Stats.js#L335
       .map(d => ({
         // again make sure to use string for id:
